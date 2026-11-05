@@ -1,0 +1,22 @@
+{
+  "name": "previews",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build"
+  },
+  "dependencies": {
+    "@sparticuz/chromium": "^153.0.0",
+    "@vercel/blob": "^2.8.2",
+    "next": "latest",
+    "puppeteer-core": "^25.16.0",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "@types/node": "latest",
+    "typescript": "latest"
+  }
+}
