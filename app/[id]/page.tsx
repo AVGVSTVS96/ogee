@@ -1,32 +1,93 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
-import { load } from "@/lib/artifact";
 
-type Props = { params: Promise<{ id: string }> };
+import { load } from "@/lib/artifact.ts";
+import type { Artifact } from "@/lib/artifact.ts";
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const art = await load((await params).id);
-  if (!art) return {};
-  const size = { width: art.width, height: art.height };
+interface Props {
+  params: Promise<{ id: string }>;
+}
+
+const loadFrom = async ({ params }: Props) => {
+  const { id } = await params;
+
+  return await load(id);
+};
+
+const openGraph = (art: Artifact): NonNullable<Metadata["openGraph"]> => {
+  const size = { height: art.height, width: art.width };
+
   return {
     title: art.title,
-    description: art.description,
-    openGraph: {
-      title: art.title,
-      description: art.description,
-      siteName: "previews",
-      type: art.video ? "video.other" : "website",
-      images: [{ url: art.image, ...size }],
-      videos: art.video ? [{ url: art.video, secureUrl: art.video, type: "video/mp4", ...size }] : undefined,
-    },
+    ...(art.description !== undefined && { description: art.description }),
+    images: [{ url: art.image, ...size }],
+    siteName: "previews",
+    type: art.video === undefined ? "website" : "video.other",
+    ...(art.video !== undefined && {
+      videos: [{ secureUrl: art.video, type: "video/mp4", url: art.video, ...size }],
+    }),
+  };
+};
+
+export const generateMetadata = async (props: Props): Promise<Metadata> => {
+  const art = await loadFrom(props);
+
+  if (art === undefined) {
+    return {};
+  }
+
+  return {
+    title: art.title,
+    ...(art.description !== undefined && { description: art.description }),
+    openGraph: openGraph(art),
     twitter: { card: "summary_large_image" },
   };
-}
+};
 
-export default async function Artifact({ params }: Props) {
-  const art = await load((await params).id);
-  if (!art) notFound();
-  if (art.html) return <iframe srcDoc={art.html} sandbox="allow-scripts" style={{ border: 0, width: "100vw", height: "100dvh" }} />;
-  if (art.video) return <video src={art.video} poster={art.image === art.video ? undefined : art.image} controls autoPlay muted loop playsInline style={{ width: "100vw" }} />;
-  return <img src={art.image} alt={art.title} style={{ width: "100vw" }} />;
-}
+const ArtifactPage = async (props: Props) => {
+  const art = await loadFrom(props);
+
+  if (art === undefined) {
+    notFound();
+  }
+
+  if (art.html !== undefined) {
+    return (
+      <iframe
+        sandbox="allow-scripts"
+        srcDoc={art.html}
+        style={{ border: 0, height: "100dvh", width: "100vw" }}
+        title={art.title}
+      />
+    );
+  }
+
+  if (art.video !== undefined) {
+    return (
+      <video
+        autoPlay
+        controls
+        loop
+        muted
+        playsInline
+        {...(art.image !== art.video && { poster: art.image })}
+        src={art.video}
+        style={{ width: "100vw" }}
+      />
+    );
+  }
+
+  return (
+    <Image
+      alt={art.title}
+      height={art.height}
+      src={art.image}
+      style={{ height: "auto", width: "100vw" }}
+      unoptimized
+      width={art.width}
+    />
+  );
+};
+
+export default ArtifactPage;

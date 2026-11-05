@@ -1,6 +1,10 @@
-// Runs in the page: replaces timers, rAF, Date and CSS/Web animations with a clock
-// that only moves when __advance(ms) is called, so each video frame is exact.
-export const clock = `(() => {
+declare global {
+  interface Window {
+    __advance: (ms: number) => void;
+  }
+}
+
+export const virtualClockScript = `(() => {
   let now = 0, seq = 0, frames = [];
   const t0 = Date.now(), timers = new Map(), started = new WeakMap();
   const add = (fn, ms, args, repeat) => {

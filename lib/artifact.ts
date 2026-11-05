@@ -1,6 +1,6 @@
 import { head, put } from "@vercel/blob";
 
-export type Artifact = {
+export interface Artifact {
   title: string;
   description?: string;
   width: number;
@@ -8,14 +8,50 @@ export type Artifact = {
   image: string;
   video?: string;
   html?: string;
+}
+
+const isArtifact = (value: unknown): value is Artifact =>
+  typeof value === "object" &&
+  value !== null &&
+  "title" in value &&
+  typeof value.title === "string" &&
+  "image" in value &&
+  typeof value.image === "string" &&
+  "width" in value &&
+  typeof value.width === "number" &&
+  "height" in value &&
+  typeof value.height === "number";
+
+export const newId = () => crypto.randomUUID().replaceAll("-", "").slice(0, 12);
+
+export const upload = async (
+  id: string,
+  name: string,
+  body: Buffer | string,
+  contentType: string,
+) => {
+  const blob = await put(`${id}/${name}`, body, {
+    access: "public",
+    addRandomSuffix: false,
+    contentType,
+  });
+
+  return blob.url;
 };
 
-export const newId = () => crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+const fetchMeta = async (url: string): Promise<Artifact | undefined> => {
+  const response = await fetch(url);
+  const meta: unknown = await response.json();
 
-export const upload = (id: string, name: string, body: Buffer | string, contentType: string) =>
-  put(`${id}/${name}`, body, { access: "public", contentType, addRandomSuffix: false }).then((b) => b.url);
+  return isArtifact(meta) ? meta : undefined;
+};
 
-export async function load(id: string): Promise<Artifact | null> {
-  const meta = await head(`${id}/meta.json`).catch(() => null);
-  return meta && (await fetch(meta.url)).json();
-}
+export const load = async (id: string): Promise<Artifact | undefined> => {
+  try {
+    const meta = await head(`${id}/meta.json`);
+
+    return await fetchMeta(meta.url);
+  } catch {
+    return undefined;
+  }
+};

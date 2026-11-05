@@ -1,39 +1,77 @@
-import { type Artifact, newId, upload } from "@/lib/artifact";
-import { record, screenshot } from "@/lib/render";
+import { newId, upload } from "@/lib/artifact.ts";
+import type { Artifact } from "@/lib/artifact.ts";
+import { record, screenshot } from "@/lib/render.ts";
+import { parseUpload } from "@/lib/request.ts";
+import type { Upload } from "@/lib/request.ts";
 
 export const maxDuration = 60;
 
-export async function POST(req: Request) {
-  if (req.headers.get("authorization") !== `Bearer ${process.env.PREVIEWS_KEY}`) {
+const fromHtml = async (id: string, html: string, request: Upload) => {
+  const { width, height, videoSeconds } = request;
+
+  if (videoSeconds > 0) {
+    const { video, poster } = await record(html, width, height, videoSeconds);
+
+    return {
+      image: await upload(id, "poster.jpg", poster, "image/jpeg"),
+      video: await upload(id, "video.mp4", video, "video/mp4"),
+    };
+  }
+
+  const still = await screenshot(html, width, height);
+
+  return { image: await upload(id, "preview.png", still, "image/png") };
+};
+
+const media = async (id: string, body: Buffer, request: Upload) => {
+  const { kind, contentType } = request;
+
+  if (kind === "html") {
+    return await fromHtml(id, body.toString(), request);
+  }
+
+  if (kind === "video") {
+    const video = await upload(id, "video.mp4", body, contentType);
+
+    return { image: request.poster ?? video, video };
+  }
+
+  const extension = contentType.split("/")[1] ?? "png";
+
+  return { image: await upload(id, `image.${extension}`, body, contentType) };
+};
+
+const authorized = (req: Request) => {
+  const key = process.env.PREVIEWS_KEY ?? "";
+
+  return key !== "" && req.headers.get("authorization") === `Bearer ${key}`;
+};
+
+export const POST = async (req: Request) => {
+  if (!authorized(req)) {
     return new Response("unauthorized", { status: 401 });
   }
-  const q = new URL(req.url).searchParams;
-  const type = req.headers.get("content-type") ?? "";
-  const body = Buffer.from(await req.arrayBuffer());
-  const id = newId();
-  const width = Number(q.get("width") ?? 1200);
-  const height = Number(q.get("height") ?? 630);
-  const art: Artifact = { title: q.get("title") ?? "", description: q.get("description") ?? undefined, width, height, image: "" };
 
-  if (type.startsWith("text/html")) {
-    art.html = body.toString();
-    const seconds = Math.min(Number(q.get("video") ?? 0), 15);
-    if (seconds > 0) {
-      const { video, poster } = await record(art.html, width, height, seconds);
-      art.video = await upload(id, "video.mp4", video, "video/mp4");
-      art.image = await upload(id, "poster.jpg", poster, "image/jpeg");
-    } else {
-      art.image = await upload(id, "preview.png", await screenshot(art.html, width, height), "image/png");
-    }
-  } else if (type.startsWith("video/")) {
-    art.video = await upload(id, "video.mp4", body, type);
-    art.image = q.get("poster") ?? art.video;
-  } else if (type.startsWith("image/")) {
-    art.image = await upload(id, `image.${type.split("/")[1]}`, body, type);
-  } else {
-    return new Response("send text/html, image/*, or video/*", { status: 415 });
+  const request = parseUpload(req);
+
+  if ("status" in request) {
+    return new Response(request.message, { status: request.status });
   }
 
+  const body = Buffer.from(await req.arrayBuffer());
+  const id = newId();
+
+  const art: Artifact = {
+    title: request.title,
+    width: request.width,
+    height: request.height,
+    ...(request.description !== undefined && { description: request.description }),
+    ...(request.kind === "html" && { html: body.toString() }),
+    ...(await media(id, body, request)),
+  };
+
   await upload(id, "meta.json", JSON.stringify(art), "application/json");
-  return Response.json({ url: `${new URL(req.url).origin}/${id}`, ...art, html: undefined });
-}
+  const { html: _html, ...shown } = art;
+
+  return Response.json({ url: `${new URL(req.url).origin}/${id}`, ...shown });
+};

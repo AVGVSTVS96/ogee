@@ -4,22 +4,33 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build"
+    "build": "next build",
+    "check": "next typegen && oxlint && oxfmt --check && tsc",
+    "fix": "oxlint --fix; oxfmt",
+    "prepare": "lefthook install"
   },
   "dependencies": {
-    "@sparticuz/chromium": "^153.0.0",
-    "@vercel/blob": "^2.8.2",
-    "ffmpeg-static": "^5.3.0",
-    "next": "latest",
-    "puppeteer-core": "^25.16.0",
-    "react": "latest",
-    "react-dom": "latest"
+    "@sparticuz/chromium": "153.0.0",
+    "@vercel/blob": "2.8.2",
+    "ffmpeg-static": "5.3.0",
+    "next": "16.4.5",
+    "playwright-core": "1.65.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   },
   "devDependencies": {
-    "@types/react": "latest",
-    "@types/node": "latest",
-    "typescript": "latest"
+    "@oxlint/plugins": "1.91.0",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "lefthook": "2.2.2",
+    "oxfmt": "0.76.0",
+    "oxlint": "1.91.0",
+    "oxlint-tsgolint": "7.0.2006",
+    "typescript": "7.0.2",
+    "ultracite": "8.1.1"
   },
+  "packageManager": "bun@1.4.3",
   "trustedDependencies": [
     "ffmpeg-static"
   ]
