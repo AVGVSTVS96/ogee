@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     if (seconds > 0) {
       const { video, poster } = await record(art.html, width, height, seconds);
       art.video = await upload(id, "video.mp4", video, "video/mp4");
-      art.image = await upload(id, "poster.png", poster, "image/png");
+      art.image = await upload(id, "poster.jpg", poster, "image/jpeg");
     } else {
       art.image = await upload(id, "preview.png", await screenshot(art.html, width, height), "image/png");
     }

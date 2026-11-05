@@ -1,9 +1,9 @@
 import { execFile } from "node:child_process";
 import { readFile, rm } from "node:fs/promises";
-import { promisify } from "node:util";
 import chromium from "@sparticuz/chromium";
 import ffmpeg from "ffmpeg-static";
 import puppeteer from "puppeteer-core";
+import { clock } from "./clock";
 
 async function open(html: string, width: number, height: number, scale: number) {
   const browser = await puppeteer.launch({
@@ -25,24 +25,33 @@ export async function screenshot(html: string, width: number, height: number) {
   }
 }
 
-export async function record(html: string, width: number, height: number, seconds: number) {
-  const { browser, page } = await open(html, width, height, 1.5);
-  const webm = `/tmp/${crypto.randomUUID()}.webm` as const;
-  const mp4 = webm.replace(".webm", ".mp4");
+const withClock = (html: string) => {
+  const tag = `<script>${clock}</script>`;
+  return /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (head) => head + tag) : tag + html;
+};
+
+export async function record(html: string, width: number, height: number, seconds: number, fps = 30) {
+  const { browser, page } = await open(withClock(html), width, height, 1.5);
+  const out = `/tmp/${crypto.randomUUID()}.mp4`;
   try {
-    const recorder = await page.screencast({ path: webm, ffmpegPath: ffmpeg! });
-    await new Promise((r) => setTimeout(r, seconds * 1000));
-    await recorder.stop();
-    const poster = Buffer.from(await page.screenshot({ type: "png" }));
-    await promisify(execFile)(ffmpeg!, [
-      "-i", webm,
+    const encoder = execFile(ffmpeg!, [
+      "-f", "image2pipe", "-framerate", `${fps}`, "-i", "-",
       "-vf", "scale=trunc(iw/2)*2:trunc(ih/2)*2",
       "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "-preset", "veryfast",
-      "-movflags", "+faststart", "-an", mp4,
+      "-movflags", "+faststart", "-an", out,
     ]);
-    return { video: await readFile(mp4), poster };
+    const finished = new Promise((ok, fail) => encoder.on("close", (code) => (code === 0 ? ok(code) : fail(new Error(`ffmpeg exited ${code}`)))));
+    let frame = Buffer.alloc(0);
+    for (let i = 0; i < seconds * fps; i++) {
+      await page.evaluate((ms) => (window as unknown as { __advance(ms: number): void }).__advance(ms), i ? 1000 / fps : 0);
+      frame = Buffer.from(await page.screenshot({ type: "jpeg", quality: 92, optimizeForSpeed: true }));
+      encoder.stdin!.write(frame);
+    }
+    encoder.stdin!.end();
+    await finished;
+    return { video: await readFile(out), poster: frame };
   } finally {
     await browser.close();
-    await Promise.all([rm(webm, { force: true }), rm(mp4, { force: true })]);
+    await rm(out, { force: true });
   }
 }
