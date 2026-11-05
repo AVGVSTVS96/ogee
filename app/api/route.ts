@@ -1,5 +1,5 @@
 import { type Artifact, newId, upload } from "@/lib/artifact";
-import { screenshot } from "@/lib/render";
+import { record, screenshot } from "@/lib/render";
 
 export const maxDuration = 60;
 
@@ -17,7 +17,14 @@ export async function POST(req: Request) {
 
   if (type.startsWith("text/html")) {
     art.html = body.toString();
-    art.image = await upload(id, "preview.png", await screenshot(art.html, width, height), "image/png");
+    const seconds = Math.min(Number(q.get("video") ?? 0), 15);
+    if (seconds > 0) {
+      const { video, poster } = await record(art.html, width, height, seconds);
+      art.video = await upload(id, "video.mp4", video, "video/mp4");
+      art.image = await upload(id, "poster.png", poster, "image/png");
+    } else {
+      art.image = await upload(id, "preview.png", await screenshot(art.html, width, height), "image/png");
+    }
   } else if (type.startsWith("video/")) {
     art.video = await upload(id, "video.mp4", body, type);
     art.image = q.get("poster") ?? art.video;
