@@ -70,7 +70,8 @@ const LinkPreview = ({ ex, children }: { ex: Example; children: ReactNode }) => 
   <div className="bubble in">
     <p>{children}</p>
     <Link className="link" href={`/${ex.id}`}>
-      {`${new URL(serverUrl).host}/${ex.id}`}
+      {new URL(serverUrl).host}/<wbr />
+      {ex.id}
     </Link>
     <div className="preview">
       <span>ogee</span>
@@ -186,10 +187,17 @@ const Home = async () => {
           <h2>Examples to copy</h2>
           <p>Each one is a single HTML file. Hand it to your agent and swap in your data.</p>
           <div className="grid">
-            {all.map((ex) => (
+            {all.map((ex, i) => (
               <figure key={ex.id}>
                 <Link href={`/${ex.id}`}>
-                  <Media art={ex.art} sizes="(max-width: 700px) 100vw, 1072px" />
+                  <Media
+                    art={ex.art}
+                    sizes={
+                      i === 0
+                        ? "(max-width: 700px) 100vw, 1072px"
+                        : "(max-width: 700px) 100vw, 524px"
+                    }
+                  />
                 </Link>
                 <figcaption>
                   <a href={`${repoUrl}/blob/main/examples/${ex.file}`}>{ex.file}</a>
