@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Deployed to production</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=block"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background:
+          radial-gradient(700px 420px at 0% 0%, rgb(34 197 94 / 0.16), transparent 70%), #09090b;
+        color: #fafafa;
+        font-family: Geist, system-ui, sans-serif;
+        padding: 64px 72px;
+        display: grid;
+        grid-template-columns: 1fr 440px;
+        gap: 56px;
+      }
+      .mono {
+        font-family: "Geist Mono", ui-monospace, monospace;
+      }
+      .project {
+        font-size: 30px;
+        color: #a1a1aa;
+      }
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+        margin-top: 26px;
+        font-size: 116px;
+        font-weight: 600;
+        letter-spacing: -0.045em;
+        line-height: 1;
+      }
+      .status i {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 0 12px rgb(34 197 94 / 0.18);
+      }
+      .commit {
+        margin-top: 48px;
+        font-size: 34px;
+        line-height: 1.35;
+        color: #e4e4e7;
+      }
+      .commit .mono {
+        display: block;
+        font-size: 26px;
+        color: #71717a;
+        margin-bottom: 8px;
+      }
+      .meta {
+        display: flex;
+        gap: 40px;
+        margin-top: 44px;
+        font-size: 26px;
+        color: #71717a;
+      }
+      .meta b {
+        display: block;
+        font-weight: 500;
+        font-size: 34px;
+        color: #fafafa;
+        margin-top: 4px;
+      }
+      ul {
+        list-style: none;
+        padding: 8px 32px;
+        border: 1px solid #27272a;
+        border-radius: 24px;
+        background: rgb(24 24 27 / 0.7);
+        align-self: center;
+      }
+      li {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 26px 0;
+        font-size: 32px;
+      }
+      li + li {
+        border-top: 1px solid #27272a;
+      }
+      li span {
+        flex: 1;
+      }
+      li small {
+        font-size: 26px;
+        color: #71717a;
+      }
+      li svg {
+        flex: none;
+        width: 36px;
+        height: 36px;
+        padding: 6px;
+        border-radius: 50%;
+        background: rgb(34 197 94 / 0.16);
+        color: #4ade80;
+      }
+    </style>
+  </head>
+  <body>
+    <section>
+      <p class="project mono">ogee / production</p>
+      <p class="status"><i></i>Ready</p>
+      <p class="commit">
+        <span class="mono">3eaf452 · main</span>
+        feat: ogee cli and agent skill
+      </p>
+      <div class="meta">
+        <p>Duration<b>1m 12s</b></p>
+        <p>Region<b>sfo1</b></p>
+        <p>By<b>agent</b></p>
+      </div>
+    </section>
+    <ul>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
+          <path d="m5 12.5 4.5 4.5L19 7.5" />
+        </svg>
+        <span>Build</span><small class="mono">38s</small>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
+          <path d="m5 12.5 4.5 4.5L19 7.5" />
+        </svg>
+        <span>Tests</span><small class="mono">214 passed</small>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
+          <path d="m5 12.5 4.5 4.5L19 7.5" />
+        </svg>
+        <span>Lint</span><small class="mono">0 issues</small>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
+          <path d="m5 12.5 4.5 4.5L19 7.5" />
+        </svg>
+        <span>Promote</span><small class="mono">live</small>
+      </li>
+    </ul>
+  </body>
+</html>

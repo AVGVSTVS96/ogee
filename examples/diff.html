@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Clamp video length</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=block"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #09090b;
+        color: #fafafa;
+        font-family: Geist, system-ui, sans-serif;
+        padding: 44px 64px;
+      }
+      header {
+        display: flex;
+        align-items: baseline;
+        gap: 24px;
+        padding: 0 8px 28px;
+      }
+      h1 {
+        font-size: 44px;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        flex: 1;
+      }
+      .stat {
+        font-family: "Geist Mono", ui-monospace, monospace;
+        font-size: 30px;
+        font-weight: 500;
+      }
+      .add {
+        color: #4ade80;
+      }
+      .del {
+        color: #fb7185;
+      }
+      figure {
+        border: 1px solid #27272a;
+        border-radius: 22px;
+        overflow: hidden;
+        background: #111113;
+      }
+      figcaption {
+        padding: 16px 28px;
+        border-bottom: 1px solid #27272a;
+        font-family: "Geist Mono", ui-monospace, monospace;
+        font-size: 24px;
+        color: #a1a1aa;
+      }
+      pre {
+        font-family: "Geist Mono", ui-monospace, monospace;
+        font-size: 27px;
+        line-height: 46px;
+        padding: 10px 0;
+        color: #d4d4d8;
+      }
+      pre > span {
+        display: block;
+        padding: 0 28px;
+        white-space: pre;
+      }
+      pre > span::before {
+        display: inline-block;
+        width: 36px;
+        color: #52525b;
+      }
+      pre > span:not(.a, .d)::before {
+        content: " ";
+      }
+      .a {
+        background: rgb(34 197 94 / 0.13);
+      }
+      .a::before {
+        content: "+";
+        color: #4ade80 !important;
+      }
+      .d {
+        background: rgb(244 63 94 / 0.13);
+        color: #a1a1aa;
+      }
+      .d::before {
+        content: "-";
+        color: #fb7185 !important;
+      }
+      .k {
+        color: #c4b5fd;
+      }
+      .n {
+        color: #fbbf24;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Clamp video length</h1>
+      <span class="stat add">+3</span>
+      <span class="stat del">-1</span>
+    </header>
+    <figure>
+      <figcaption>lib/request.ts</figcaption>
+      <pre><span><span class="k">const</span> MAX_SIDE = <span class="n">4096</span>;</span><span class="a"><span class="k">const</span> MAX_VIDEO_SECONDS = <span class="n">15</span>;</span><span><span class="k">const</span> seconds = (raw: string | null) =&gt; {</span><span>  <span class="k">const</span> value = Number(raw ?? <span class="n">0</span>);</span><span class="d">  <span class="k">return</span> value;</span><span class="a">  <span class="k">return</span> Number.isFinite(value) &amp;&amp; value &gt;= <span class="n">0</span></span><span class="a">    ? Math.min(value, MAX_VIDEO_SECONDS) : undefined;</span><span>};</span></pre>
+    </figure>
+  </body>
+</html>

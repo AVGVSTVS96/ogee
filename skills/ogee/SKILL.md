@@ -5,7 +5,7 @@ description: Show something visual in a chat that only takes text (Telegram, iMe
 
 # ogee
 
-Chat apps don't render HTML, but they render link previews. ogee turns your HTML, image or mp4 into a fresh link whose preview is that content: a full-width image, or a muted video that autoplays inline in Telegram and iMessage. Apps that don't play video show the first frame instead.
+Chat apps don't render HTML, but they render link previews. ogee turns your HTML, image or mp4 into a fresh link whose preview is that content: a full-width image, or a muted video that autoplays inline in Telegram and iMessage. Apps that don't play video show the last frame instead.
 
 ## Make one
 
@@ -37,6 +37,9 @@ Every call returns a new link, which is what keeps previews from going stale: ap
 
 ## Make it look right
 
+Start from an example in [examples/](https://github.com/AVGVSTVS96/ogee/tree/main/examples) (metric, chart, deploy status, diff, animated agent run): each is one HTML file with its data at the top.
+
 - Design for a phone: big type (40px+ for the main number or headline), high contrast, one idea per card.
 - Animations run on a recorded clock, so CSS animations, `requestAnimationFrame` and timers all play smoothly from frame zero. Keep videos short (2–6s); the last frame becomes the still.
+- The renderer has almost no system fonts: load a webfont (the examples use Geist from Google Fonts) and draw icons and arrows as inline SVG, since characters like → or emoji may render as empty boxes.
 - Tapping the link opens the live HTML, so it can be interactive beyond the preview.

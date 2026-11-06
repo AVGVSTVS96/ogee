@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Deploys this week</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=block"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #09090b;
+        color: #fafafa;
+        font-family: Geist, system-ui, sans-serif;
+        padding: 60px 72px 52px;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .label {
+        font-size: 34px;
+        color: #a1a1aa;
+        font-weight: 500;
+      }
+      .total {
+        font-size: 96px;
+        font-weight: 600;
+        letter-spacing: -0.04em;
+        line-height: 1.05;
+      }
+      .legend {
+        display: flex;
+        gap: 28px;
+        font-size: 26px;
+        color: #a1a1aa;
+        padding-bottom: 14px;
+      }
+      .legend i {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border-radius: 5px;
+        margin-right: 10px;
+        vertical-align: -1px;
+      }
+      .bars {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 28px;
+        margin-top: 36px;
+        border-bottom: 1px solid #27272a;
+        background: repeating-linear-gradient(
+          to top,
+          transparent 0 calc(25% - 1px),
+          rgb(255 255 255 / 0.05) calc(25% - 1px) 25%
+        );
+      }
+      .bar {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+      }
+      .bar b {
+        font-size: 28px;
+        font-weight: 500;
+        color: #a1a1aa;
+        font-variant-numeric: tabular-nums;
+      }
+      .bar span {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px 10px 0 0;
+        overflow: hidden;
+      }
+      .ok {
+        background: rgb(124 92 255 / 0.4);
+      }
+      .failed {
+        background: #f43f5e;
+      }
+      .today .ok {
+        background: linear-gradient(#a78bfa, #7c5cff);
+      }
+      .today b {
+        color: #fafafa;
+      }
+      .days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 28px;
+        margin-top: 14px;
+        text-align: center;
+        font-family: "Geist Mono", ui-monospace, monospace;
+        font-size: 24px;
+        color: #71717a;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <p class="label">Deploys this week</p>
+        <p class="total">142</p>
+      </div>
+      <div class="legend">
+        <span><i style="background: #7c5cff"></i>shipped</span>
+        <span><i style="background: #f43f5e"></i>failed</span>
+      </div>
+    </header>
+    <div class="bars" id="bars"></div>
+    <div class="days" id="days"></div>
+    <script>
+      const week = [
+        ["mon", 18, 1],
+        ["tue", 24, 0],
+        ["wed", 21, 2],
+        ["thu", 27, 1],
+        ["fri", 31, 0],
+        ["sat", 6, 0],
+        ["sun", 11, 0],
+      ];
+      const today = 4;
+      const most = Math.max(...week.map(([, ok, failed]) => ok + failed));
+      for (const [i, [day, ok, failed]] of week.entries()) {
+        const bar = document.createElement("div");
+        bar.className = i === today ? "bar today" : "bar";
+        bar.innerHTML = `<b>${ok + failed}</b><span style="height:${((ok + failed) / most) * 82}%">
+          <i class="failed" style="flex:${failed}"></i><i class="ok" style="flex:${ok}"></i></span>`;
+        document.getElementById("bars").append(bar);
+        document
+          .getElementById("days")
+          .insertAdjacentHTML(
+            "beforeend",
+            `<span${i === today ? ' style="color:#fafafa"' : ""}>${day}</span>`,
+          );
+      }
+    </script>
+  </body>
+</html>
