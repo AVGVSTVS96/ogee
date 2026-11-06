@@ -70,6 +70,16 @@ export const POST = async (req: Request) => {
     }
     t[`load${index}`] = ms(p);
     const cdp = capture === "cdp" ? await page.context().newCDPSession(page) : undefined;
+    if (cdp !== undefined && q.get("emul") === "1") {
+      await cdp.send("Emulation.setDeviceMetricsOverride", {
+        deviceScaleFactor: scale,
+        height: 630,
+        mobile: false,
+        width: 1200,
+      });
+    }
+    const clip =
+      q.get("clip") === "1" ? { clip: { height: 630, scale, width: 1200, x: 0, y: 0 } } : {};
     p = performance.now();
     let advance = 0;
     for (let i = index; i < frames; i += pages) {
@@ -84,6 +94,7 @@ export const POST = async (req: Request) => {
         const buf = await page.screenshot({
           type: fmt === "webp" ? "png" : fmt,
           ...(fmt === "jpeg" && { quality: 92 }),
+          ...(q.get("caret") === "1" && { caret: "initial" as const }),
         });
         bytes += buf.length;
         last = buf;
@@ -92,6 +103,7 @@ export const POST = async (req: Request) => {
           format: fmt,
           ...(fmt !== "png" && { quality: 92 }),
           optimizeForSpeed: speed,
+          ...clip,
         });
         bytes += (data.length * 3) / 4;
         last = Buffer.from(data, "base64");
