@@ -3,7 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { load } from "@/lib/artifact.ts";
-import type { Artifact } from "@/lib/artifact.ts";
+import { artifactMetadata } from "@/lib/metadata.ts";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -15,34 +15,10 @@ const loadFrom = async ({ params }: Props) => {
   return await load(id);
 };
 
-const openGraph = (art: Artifact): NonNullable<Metadata["openGraph"]> => {
-  const size = { height: art.height, width: art.width };
-
-  return {
-    title: art.title,
-    ...(art.description !== undefined && { description: art.description }),
-    images: [{ url: art.image, ...size }],
-    siteName: "ogee",
-    type: art.video === undefined ? "website" : "video.other",
-    ...(art.video !== undefined && {
-      videos: [{ secureUrl: art.video, type: "video/mp4", url: art.video, ...size }],
-    }),
-  };
-};
-
 export const generateMetadata = async (props: Props): Promise<Metadata> => {
   const art = await loadFrom(props);
 
-  if (art === undefined) {
-    return {};
-  }
-
-  return {
-    title: art.title,
-    ...(art.description !== undefined && { description: art.description }),
-    openGraph: openGraph(art),
-    twitter: { card: "summary_large_image" },
-  };
+  return art === undefined ? {} : artifactMetadata(art);
 };
 
 const ArtifactPage = async (props: Props) => {

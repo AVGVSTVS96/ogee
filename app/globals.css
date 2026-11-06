@@ -1,0 +1,508 @@
+:root {
+  color-scheme: light dark;
+  --bg: #fafafa;
+  --fg: #09090b;
+  --muted: #52525b;
+  --subtle: #71717a;
+  --line: #e4e4e7;
+  --panel: #ffffff;
+  --raised: #f4f4f5;
+  --accent: #7c5cff;
+  --accent-fg: #6440f5;
+  --grid: rgb(9 9 11 / 0.05);
+  --glow: rgb(124 92 255 / 0.14);
+  --shadow: 0 30px 80px -30px rgb(24 24 27 / 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #09090b;
+    --fg: #fafafa;
+    --muted: #a1a1aa;
+    --subtle: #71717a;
+    --line: #27272a;
+    --panel: #111113;
+    --raised: #1c1c21;
+    --accent-fg: #a78bfa;
+    --grid: rgb(255 255 255 / 0.045);
+    --glow: rgb(124 92 255 / 0.22);
+    --shadow: 0 30px 80px -30px rgb(0 0 0 / 0.8);
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+code,
+pre {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+.mark {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+.nav,
+main,
+.footer {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-inline: 24px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.brand,
+.footer span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.nav div {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.nav div a:hover {
+  color: var(--fg);
+}
+
+.nav .github {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--fg);
+  background: var(--panel);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  align-items: center;
+  gap: 64px;
+  padding: 72px 0 96px;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 960px;
+  background:
+    radial-gradient(600px 400px at 70% 40%, var(--glow), transparent 70%),
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 48px 48px;
+  mask-image: linear-gradient(#000 60%, transparent);
+}
+
+h1 {
+  font-size: clamp(48px, 7vw, 84px);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+}
+
+h1 em {
+  font-style: normal;
+  color: var(--accent-fg);
+}
+
+.lede {
+  max-width: 520px;
+  margin-top: 24px;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.command {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 36px;
+  padding: 8px 8px 8px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.command code {
+  font-size: 15px;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.command code span {
+  color: var(--subtle);
+}
+
+.command button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--raised);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.command button:hover {
+  color: var(--fg);
+}
+
+.command svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hint {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--subtle);
+}
+
+.hint code {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.chat {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.chat header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.chat header .mark {
+  width: 36px;
+  height: 36px;
+}
+
+.chat header b {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.chat header small {
+  font-size: 13px;
+  color: var(--subtle);
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 14px;
+}
+
+.bubble {
+  max-width: 88%;
+  padding: 9px 13px;
+  border-radius: 18px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.bubble.out {
+  align-self: flex-end;
+  border-bottom-right-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+}
+
+.bubble.in {
+  align-self: flex-start;
+  width: 88%;
+  border-bottom-left-radius: 6px;
+  background: var(--raised);
+}
+
+.bubble .link {
+  display: block;
+  overflow: hidden;
+  color: var(--accent-fg);
+  font-size: 14px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.preview {
+  display: grid;
+  gap: 2px;
+  margin-top: 8px;
+  padding-left: 10px;
+  border-left: 3px solid var(--accent);
+  font-size: 13px;
+}
+
+.preview span {
+  color: var(--accent-fg);
+  font-weight: 600;
+}
+
+.preview small {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.preview img,
+.preview video,
+.grid img,
+.grid video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1200 / 630;
+  border-radius: 10px;
+  background: #09090b;
+}
+
+.preview img,
+.preview video {
+  margin-top: 6px;
+}
+
+.how {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--panel);
+}
+
+.how div {
+  padding: 28px;
+}
+
+.how div + div {
+  border-left: 1px solid var(--line);
+}
+
+.how span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 14px;
+}
+
+.how h2 {
+  margin-top: 18px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.how p {
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.api,
+.gallery {
+  padding-top: 96px;
+}
+
+.api h2,
+.gallery h2 {
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.api pre {
+  margin-top: 20px;
+  padding: 22px 24px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.gallery > p {
+  margin-top: 10px;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.grid figure:first-child {
+  grid-column: 1 / -1;
+}
+
+.grid img,
+.grid video {
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  transition: translate 0.2s ease;
+}
+
+.grid a:hover img,
+.grid a:hover video {
+  translate: 0 -3px;
+}
+
+.grid figcaption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 15px;
+}
+
+.grid figcaption b {
+  overflow: hidden;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.grid figcaption a {
+  flex: none;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--subtle);
+}
+
+.grid figcaption a:hover {
+  color: var(--accent-fg);
+}
+
+.footer {
+  width: min(1072px, 100% - 48px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 112px;
+  padding: 32px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--subtle);
+}
+
+.footer span {
+  font-size: 16px;
+  color: var(--fg);
+}
+
+.footer .mark {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 960px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 56px;
+    padding-top: 48px;
+  }
+
+  .chat {
+    width: 100%;
+    max-width: 440px;
+    justify-self: center;
+  }
+}
+
+@media (max-width: 700px) {
+  .nav div a:not(.github) {
+    display: none;
+  }
+
+  .command code {
+    font-size: 13px;
+  }
+
+  .how {
+    grid-template-columns: 1fr;
+  }
+
+  .how div + div {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .api,
+  .gallery {
+    padding-top: 72px;
+  }
+
+  .api h2,
+  .gallery h2 {
+    font-size: 26px;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

@@ -4,6 +4,8 @@ import path from "node:path";
 import { text } from "node:stream/consumers";
 import { parseArgs } from "node:util";
 
+import { serverUrl } from "../lib/site.ts";
+
 const types = new Map([
   [".gif", "image/gif"],
   [".htm", "text/html"],
@@ -66,7 +68,7 @@ const query = new URLSearchParams(
   ),
 );
 
-const server = process.env.OGEE_URL ?? "https://previews-alpha-coral.vercel.app";
+const server = process.env.OGEE_URL ?? serverUrl;
 
 const res = await fetch(`${server}/api?${query.toString()}`, {
   body,

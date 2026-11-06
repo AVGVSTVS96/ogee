@@ -4,7 +4,7 @@ import { record, screenshot } from "@/lib/render.ts";
 import { parseUpload } from "@/lib/request.ts";
 import type { Upload } from "@/lib/request.ts";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const fromHtml = async (id: string, html: string, request: Upload) => {
   const { width, height, videoSeconds } = request;
