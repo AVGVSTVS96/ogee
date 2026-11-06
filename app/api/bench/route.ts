@@ -1,0 +1,110 @@
+import os from "node:os";
+
+import chromium from "@sparticuz/chromium";
+import { chromium as playwright } from "playwright-core";
+import type { Browser, Page } from "playwright-core";
+
+import { virtualClockScript } from "@/lib/virtual-clock.ts";
+
+export const maxDuration = 300;
+
+const kept = new Map<string, Browser>();
+
+const launch = async (graphics: boolean, extra: string[]) => {
+  chromium.setGraphicsMode = graphics;
+  const args = [...chromium.args, ...extra];
+  return await playwright.launch({ args, executablePath: await chromium.executablePath() });
+};
+
+const ms = (t: number) => Math.round(performance.now() - t);
+
+export const POST = async (req: Request) => {
+  if (req.headers.get("authorization") !== `Bearer ${process.env.OGEE_KEY ?? "x"}`) {
+    return new Response("no", { status: 401 });
+  }
+  const q = new URL(req.url).searchParams;
+  const graphics = q.get("graphics") !== "0";
+  const capture = q.get("capture") ?? "pw";
+  const fmt = (q.get("fmt") ?? "png") as "png" | "jpeg" | "webp";
+  const speed = q.get("speed") === "1";
+  const scale = Number(q.get("scale") ?? "2");
+  const frames = Number(q.get("frames") ?? "1");
+  const pages = Number(q.get("pages") ?? "1");
+  const reuse = q.get("reuse") === "1";
+  const extra = (q.get("args") ?? "").split(" ").filter(Boolean);
+  const html = await req.text();
+  const t: Record<string, number | string> = {
+    cpus: os.availableParallelism(),
+    memGB: Math.round(os.totalmem() / 1e9),
+    region: process.env.VERCEL_REGION ?? "",
+  };
+
+  let s = performance.now();
+  const key = `${graphics}${extra.join()}`;
+  let browser = reuse ? kept.get(key) : undefined;
+  t.warm = browser === undefined ? 0 : 1;
+  if (browser === undefined || !browser.isConnected()) {
+    browser = await launch(graphics, extra);
+    if (reuse) {
+      kept.set(key, browser);
+    }
+  }
+  t.launch = ms(s);
+
+  const html2 = frames > 1 ? `<script>${virtualClockScript}</script>${html}` : html;
+  const total = performance.now();
+  let bytes = 0;
+  const one = async (index: number) => {
+    let p = performance.now();
+    const context = await browser.newContext({
+      deviceScaleFactor: scale,
+      viewport: { height: 630, width: 1200 },
+    });
+    const page: Page = await context.newPage();
+    t[`page${index}`] = ms(p);
+    p = performance.now();
+    await page.setContent(html2, { waitUntil: "load" });
+    t[`load${index}`] = ms(p);
+    const cdp = capture === "cdp" ? await page.context().newCDPSession(page) : undefined;
+    p = performance.now();
+    let advance = 0;
+    for (let i = index; i < frames; i += pages) {
+      if (frames > 1) {
+        const a = performance.now();
+        await page.evaluate((step) => {
+          window.__advance(step);
+        }, i === index ? (i * 1000) / 30 : (pages * 1000) / 30);
+        advance += performance.now() - a;
+      }
+      if (cdp === undefined) {
+        const buf = await page.screenshot({
+          type: fmt === "webp" ? "png" : fmt,
+          ...(fmt === "jpeg" && { quality: 92 }),
+        });
+        bytes += buf.length;
+      } else {
+        const { data } = await cdp.send("Page.captureScreenshot", {
+          format: fmt,
+          ...(fmt !== "png" && { quality: 92 }),
+          optimizeForSpeed: speed,
+        });
+        bytes += (data.length * 3) / 4;
+      }
+    }
+    t[`shots${index}`] = ms(p);
+    t[`advance${index}`] = Math.round(advance);
+    p = performance.now();
+    await context.close();
+    t[`ctxclose${index}`] = ms(p);
+  };
+  await Promise.all(Array.from({ length: pages }, (_, i) => one(i)));
+  t.work = ms(total);
+  t.perFrame = Math.round(Number(t.work) / frames);
+  t.kb = Math.round(bytes / 1024 / frames);
+  if (!reuse) {
+    s = performance.now();
+    await browser.close();
+    t.close = ms(s);
+  }
+  return Response.json(t);
+};
