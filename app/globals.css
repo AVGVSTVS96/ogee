@@ -147,7 +147,7 @@ h2 {
 }
 
 h1 {
-  font-size: clamp(48px, 7vw, 84px);
+  font-size: min(10.5cqi, 72px);
   font-weight: 600;
   letter-spacing: -0.05em;
   line-height: 0.98;
@@ -159,6 +159,7 @@ h1 em {
 }
 
 .pitch {
+  container-type: inline-size;
   padding-top: 72px;
 }
 
