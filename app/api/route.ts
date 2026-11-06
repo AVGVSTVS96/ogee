@@ -2,6 +2,7 @@ import { newId, upload } from "@/lib/artifact.ts";
 import type { Artifact } from "@/lib/artifact.ts";
 import { record, screenshot } from "@/lib/render.ts";
 import { parseUpload } from "@/lib/request.ts";
+import { resetTiming, serverTiming, timed } from "@/lib/timing.ts";
 import type { Upload } from "@/lib/request.ts";
 
 export const maxDuration = 300;
@@ -13,14 +14,14 @@ const fromHtml = async (id: string, html: string, request: Upload) => {
     const { video, poster } = await record(html, width, height, videoSeconds);
 
     return {
-      image: await upload(id, "poster.jpg", poster, "image/jpeg"),
-      video: await upload(id, "video.mp4", video, "video/mp4"),
+      image: await timed("upPoster", () => upload(id, "poster.jpg", poster, "image/jpeg")),
+      video: await timed("upVideo", () => upload(id, "video.mp4", video, "video/mp4")),
     };
   }
 
   const still = await screenshot(html, width, height);
 
-  return { image: await upload(id, "preview.png", still, "image/png") };
+  return { image: await timed("upload", () => upload(id, "preview.png", still, "image/png")) };
 };
 
 const media = async (id: string, body: Buffer, request: Upload) => {
@@ -48,6 +49,8 @@ const authorized = (req: Request) => {
 };
 
 export const POST = async (req: Request) => {
+  resetTiming();
+  const t0 = performance.now();
   if (!authorized(req)) {
     return new Response("unauthorized", { status: 401 });
   }
@@ -70,10 +73,10 @@ export const POST = async (req: Request) => {
     ...(await media(id, body, request)),
   };
 
-  await upload(id, "meta.json", JSON.stringify(art), "application/json");
+  await timed("meta", () => upload(id, "meta.json", JSON.stringify(art), "application/json"));
   const { html: _html, ...shown } = art;
 
   const url = `${new URL(req.url).origin}/${id}`;
 
-  return Response.json({ url, ...shown }, { headers: { location: url }, status: 201 });
+  return Response.json({ url, ...shown }, { headers: { location: url, "server-timing": `${serverTiming()}, total;dur=${(performance.now() - t0).toFixed(0)}` }, status: 201 });
 };
