@@ -73,5 +73,7 @@ export const POST = async (req: Request) => {
   await upload(id, "meta.json", JSON.stringify(art), "application/json");
   const { html: _html, ...shown } = art;
 
-  return Response.json({ url: `${new URL(req.url).origin}/${id}`, ...shown });
+  const url = `${new URL(req.url).origin}/${id}`;
+
+  return Response.json({ url, ...shown }, { headers: { location: url }, status: 201 });
 };

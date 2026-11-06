@@ -1,0 +1,32 @@
+{
+  "name": "ogee",
+  "version": "0.1.0",
+  "description": "Turn HTML, images or video into a link whose chat preview is the thing itself",
+  "keywords": [
+    "agents",
+    "artifacts",
+    "link-preview",
+    "open-graph",
+    "telegram"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AVGVSTVS96/ogee.git",
+    "directory": "cli"
+  },
+  "bin": {
+    "ogee": "dist/ogee.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "bun build ogee.ts --target node --outfile dist/ogee.js",
+    "prepublishOnly": "bun run build"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
