@@ -54,6 +54,7 @@ export const POST = async (req: Request) => {
   const html2 = frames > 1 ? `<script>${virtualClockScript}</script>${html}` : html;
   const total = performance.now();
   let bytes = 0;
+  let last: Buffer = Buffer.alloc(0);
   const one = async (index: number) => {
     let p = performance.now();
     const context = await browser.newContext({
@@ -64,6 +65,9 @@ export const POST = async (req: Request) => {
     t[`page${index}`] = ms(p);
     p = performance.now();
     await page.setContent(html2, { waitUntil: "load" });
+    if (q.get("fonts") === "1") {
+      await page.evaluate(() => document.fonts.ready);
+    }
     t[`load${index}`] = ms(p);
     const cdp = capture === "cdp" ? await page.context().newCDPSession(page) : undefined;
     p = performance.now();
@@ -82,6 +86,7 @@ export const POST = async (req: Request) => {
           ...(fmt === "jpeg" && { quality: 92 }),
         });
         bytes += buf.length;
+        last = buf;
       } else {
         const { data } = await cdp.send("Page.captureScreenshot", {
           format: fmt,
@@ -89,6 +94,7 @@ export const POST = async (req: Request) => {
           optimizeForSpeed: speed,
         });
         bytes += (data.length * 3) / 4;
+        last = Buffer.from(data, "base64");
       }
     }
     t[`shots${index}`] = ms(p);
@@ -105,6 +111,9 @@ export const POST = async (req: Request) => {
     s = performance.now();
     await browser.close();
     t.close = ms(s);
+  }
+  if (q.get("out") === "1") {
+    return new Response(new Uint8Array(last), { headers: { "x-t": JSON.stringify(t) } });
   }
   return Response.json(t);
 };
