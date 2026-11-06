@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 export default {
+  images: { remotePatterns: [{ hostname: "*.public.blob.vercel-storage.com", protocol: "https" }] },
   serverExternalPackages: ["ffmpeg-static", "@sparticuz/chromium", "playwright-core"],
   outputFileTracingIncludes: {
     "/api": [

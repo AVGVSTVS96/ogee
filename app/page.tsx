@@ -20,6 +20,8 @@ const examples = [
   { file: "diff.html", id: "76c49adfbb87" },
 ];
 
+const skillUrl = `${repoUrl}/blob/main/skills/ogee/SKILL.md`;
+
 const title = "ogee: inline HTML artifacts for any agent, in any chat";
 
 const description =
@@ -57,9 +59,9 @@ const Mark = () => (
   </svg>
 );
 
-const Media = ({ art }: { art: Artifact }) =>
+const Media = ({ art, sizes }: { art: Artifact; sizes: string }) =>
   art.video === undefined ? (
-    <Image alt={art.title} height={art.height} src={art.image} unoptimized width={art.width} />
+    <Image alt={art.title} height={art.height} sizes={sizes} src={art.image} width={art.width} />
   ) : (
     <video autoPlay loop muted playsInline poster={art.image} src={art.video} />
   );
@@ -74,12 +76,12 @@ const LinkPreview = ({ ex, children }: { ex: Example; children: ReactNode }) => 
       <span>ogee</span>
       <b>{ex.art.title}</b>
       {ex.art.description !== undefined && <small>{ex.art.description}</small>}
-      <Media art={ex.art} />
+      <Media art={ex.art} sizes="360px" />
     </div>
   </div>
 );
 
-const Chat = ({ run, deploy }: { run: Example; deploy: Example }) => (
+const Chat = ({ run }: { run: Example }) => (
   <figure aria-label="An agent sending ogee links in a chat" className="chat">
     <header>
       <Mark />
@@ -92,19 +94,19 @@ const Chat = ({ run, deploy }: { run: Example; deploy: Example }) => (
       <p className="bubble out">is the checkout flake fixed?</p>
       <LinkPreview ex={run}>Fixed, PR is up:</LinkPreview>
       <p className="bubble out">ship it</p>
-      <LinkPreview ex={deploy}>Live.</LinkPreview>
+      <p className="bubble in">Shipped. 3eaf452 is live in production.</p>
     </div>
   </figure>
 );
 
-const curl = `curl -X POST "${serverUrl}/api?title=Deploys&video=4" \\
+const curl = `curl "${serverUrl}/api?video=4" \\
   -H "authorization: Bearer $OGEE_KEY" \\
   -H "content-type: text/html" \\
   --data-binary @card.html`;
 
 const Home = async () => {
   const all = await loadExamples();
-  const [run, deploy] = all;
+  const [run] = all;
 
   return (
     <>
@@ -115,8 +117,10 @@ const Home = async () => {
           ogee
         </Link>
         <div>
-          <a href="#examples">Examples</a>
-          <a href={`${repoUrl}/blob/main/skills/ogee/SKILL.md`}>Agent skill</a>
+          <a className="wide" href="#examples">
+            Examples
+          </a>
+          <a href={skillUrl}>Agent skill</a>
           <a className="github" href={repoUrl}>
             GitHub
           </a>
@@ -141,7 +145,7 @@ const Home = async () => {
               Needs <code>OGEE_KEY</code>. Prints a fresh link.
             </p>
           </div>
-          {run !== undefined && deploy !== undefined && <Chat deploy={deploy} run={run} />}
+          {run !== undefined && <Chat run={run} />}
         </section>
 
         <section className="how">
@@ -185,10 +189,9 @@ const Home = async () => {
             {all.map((ex) => (
               <figure key={ex.id}>
                 <Link href={`/${ex.id}`}>
-                  <Media art={ex.art} />
+                  <Media art={ex.art} sizes="(max-width: 700px) 100vw, 1072px" />
                 </Link>
                 <figcaption>
-                  <b>{ex.art.title}</b>
                   <a href={`${repoUrl}/blob/main/examples/${ex.file}`}>{ex.file}</a>
                 </figcaption>
               </figure>
@@ -202,7 +205,11 @@ const Home = async () => {
           <Mark />
           ogee
         </span>
-        <a href={repoUrl}>github.com/AVGVSTVS96/ogee</a>
+        <div>
+          <a href="#examples">Examples</a>
+          <a href={skillUrl}>Agent skill</a>
+          <a href={repoUrl}>GitHub</a>
+        </div>
       </footer>
     </>
   );

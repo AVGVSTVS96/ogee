@@ -19,7 +19,7 @@
     --bg: #09090b;
     --fg: #fafafa;
     --muted: #a1a1aa;
-    --subtle: #71717a;
+    --subtle: #85858f;
     --line: #27272a;
     --panel: #111113;
     --raised: #1c1c21;
@@ -45,6 +45,20 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 code,
@@ -95,6 +109,10 @@ main,
   color: var(--fg);
 }
 
+.nav .github:hover {
+  border-color: var(--subtle);
+}
+
 .nav .github {
   padding: 7px 14px;
   border: 1px solid var(--line);
@@ -106,9 +124,9 @@ main,
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 400px;
-  align-items: center;
+  align-items: start;
   gap: 64px;
-  padding: 72px 0 96px;
+  padding: 56px 0 96px;
 }
 
 .backdrop {
@@ -135,8 +153,13 @@ h1 em {
   color: var(--accent-fg);
 }
 
+.pitch {
+  padding-top: 72px;
+}
+
 .lede {
   max-width: 520px;
+  text-wrap: pretty;
   margin-top: 24px;
   font-size: 18px;
   line-height: 1.55;
@@ -160,11 +183,11 @@ h1 em {
 .command code {
   font-size: 15px;
   white-space: nowrap;
-  overflow-x: auto;
 }
 
-.command code span {
+.command .prompt {
   color: var(--subtle);
+  user-select: none;
 }
 
 .command button {
@@ -182,6 +205,10 @@ h1 em {
 
 .command button:hover {
   color: var(--fg);
+}
+
+.command button[data-copied="true"] {
+  color: var(--accent-fg);
 }
 
 .command svg {
@@ -268,11 +295,9 @@ h1 em {
 
 .bubble .link {
   display: block;
-  overflow: hidden;
   color: var(--accent-fg);
   font-size: 14px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
 .preview {
@@ -348,6 +373,7 @@ h1 em {
 
 .how p {
   margin-top: 8px;
+  text-wrap: pretty;
   font-size: 15px;
   line-height: 1.55;
   color: var(--muted);
@@ -407,23 +433,7 @@ h1 em {
 }
 
 .grid figcaption {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 12px;
-  font-size: 15px;
-}
-
-.grid figcaption b {
-  overflow: hidden;
-  font-weight: 500;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.grid figcaption a {
-  flex: none;
+  margin-top: 10px;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 13px;
   color: var(--subtle);
@@ -450,6 +460,15 @@ h1 em {
   color: var(--fg);
 }
 
+.footer div {
+  display: flex;
+  gap: 24px;
+}
+
+.footer div a:hover {
+  color: var(--fg);
+}
+
 .footer .mark {
   width: 20px;
   height: 20px;
@@ -462,20 +481,32 @@ h1 em {
     padding-top: 48px;
   }
 
+  .pitch {
+    padding-top: 0;
+  }
+
   .chat {
     width: 100%;
     max-width: 440px;
-    justify-self: center;
   }
 }
 
 @media (max-width: 700px) {
-  .nav div a:not(.github) {
+  .nav .wide {
     display: none;
   }
 
+  .command {
+    margin-top: 28px;
+  }
+
   .command code {
-    font-size: 13px;
+    font-size: clamp(11px, 3.4vw, 14px);
+  }
+
+  .api pre {
+    padding: 18px;
+    font-size: 12px;
   }
 
   .how {

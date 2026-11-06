@@ -18,10 +18,12 @@ const CopyCommand = ({ command }: { command: string }) => {
   return (
     <div className="command">
       <code>
-        <span aria-hidden>$ </span>
+        <span aria-hidden className="prompt">
+          ${" "}
+        </span>
         {command}
       </code>
-      <button aria-label="Copy command" onClick={copy} type="button">
+      <button aria-label="Copy command" data-copied={copied} onClick={copy} type="button">
         {copied ? (
           <svg aria-hidden viewBox="0 0 24 24">
             <path d="m5 12.5 4.5 4.5L19 7.5" />
@@ -33,6 +35,9 @@ const CopyCommand = ({ command }: { command: string }) => {
           </svg>
         )}
       </button>
+      <span aria-live="polite" className="sr-only">
+        {copied ? "Copied" : ""}
+      </span>
     </div>
   );
 };
