@@ -1,1 +1,1 @@
-{ "framework": "nextjs" }
+{ "framework": "nextjs", "functions": { "app/api/bench/route.ts": { "memory": 4096 } } }
