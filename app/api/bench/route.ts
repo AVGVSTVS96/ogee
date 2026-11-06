@@ -12,7 +12,8 @@ const kept = new Map<string, Browser>();
 
 const launch = async (graphics: boolean, extra: string[]) => {
   chromium.setGraphicsMode = graphics;
-  const args = [...chromium.args, ...extra];
+  const drop = new Set(extra.filter((a) => a.startsWith("-no")).map((a) => a.slice(3)));
+  const args = [...chromium.args.filter((a) => !drop.has(a)), ...extra.filter((a) => !a.startsWith("-no"))];
   return await playwright.launch({ args, executablePath: await chromium.executablePath() });
 };
 
