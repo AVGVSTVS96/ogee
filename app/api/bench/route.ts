@@ -58,7 +58,8 @@ export const POST = async (req: Request) => {
   let last: Buffer = Buffer.alloc(0);
   const one = async (index: number) => {
     let p = performance.now();
-    const context = await browser.newContext({
+    const own = q.get("multi") === "1" && index > 0 ? await launch(graphics, extra) : browser;
+    const context = await own.newContext({
       deviceScaleFactor: scale,
       viewport: { height: 630, width: 1200 },
     });
@@ -114,6 +115,9 @@ export const POST = async (req: Request) => {
     t[`advance${index}`] = Math.round(advance);
     p = performance.now();
     await context.close();
+    if (own !== browser) {
+      await own.close();
+    }
     t[`ctxclose${index}`] = ms(p);
   };
   await Promise.all(Array.from({ length: pages }, (_, i) => one(i)));
