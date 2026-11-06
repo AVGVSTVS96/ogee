@@ -10,7 +10,7 @@ import { repoUrl, serverUrl } from "@/lib/site.ts";
 
 import CopyCommand from "./copy-command.tsx";
 
-const homeCard = "6f851de9d1eb";
+const homeCard = "db70e89c9ad5";
 
 const examples = [
   { file: "agent-run.html", id: "55dc11ea098b" },
@@ -22,7 +22,7 @@ const examples = [
 
 const skillUrl = `${repoUrl}/blob/main/skills/ogee/SKILL.md`;
 
-const title = "ogee: inline HTML artifacts for any agent, in any chat";
+const title = "ogee: inline HTML artifacts, wherever you are";
 
 const description =
   "Post HTML, an image or an mp4 and get a link whose chat preview is the thing itself: a sharp card, or a video that plays inline.";
@@ -132,14 +132,14 @@ const Home = async () => {
         <section className="hero">
           <div className="pitch">
             <h1>
-              Send a link.
+              Inline HTML artifacts.
               <br />
-              <em>It plays.</em>
+              <em>Wherever you are.</em>
             </h1>
             <p className="lede">
-              Inline HTML artifacts for any agent, in any chat. Post HTML, an image or an mp4 and
-              get back a link whose preview is the thing itself: a sharp card, or a video that
-              autoplays inline in Telegram.
+              Telegram doesn&apos;t render HTML. Neither do iMessage, WhatsApp or Slack. Your agent
+              posts HTML to ogee and gets back a link, and the chat shows it as a sharp card or a
+              video that plays inline.
             </p>
             <CopyCommand command="npx ogee card.html --video 4" />
             <p className="hint">
