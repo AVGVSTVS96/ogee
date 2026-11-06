@@ -22,7 +22,7 @@ const openGraph = (art: Artifact): NonNullable<Metadata["openGraph"]> => {
     title: art.title,
     ...(art.description !== undefined && { description: art.description }),
     images: [{ url: art.image, ...size }],
-    siteName: "previews",
+    siteName: "ogee",
     type: art.video === undefined ? "website" : "video.other",
     ...(art.video !== undefined && {
       videos: [{ secureUrl: art.video, type: "video/mp4", url: art.video, ...size }],

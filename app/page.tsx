@@ -1,3 +1,3 @@
-const Home = () => <main>previews</main>;
+const Home = () => <main>ogee</main>;
 
 export default Home;

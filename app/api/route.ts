@@ -42,7 +42,7 @@ const media = async (id: string, body: Buffer, request: Upload) => {
 };
 
 const authorized = (req: Request) => {
-  const key = process.env.PREVIEWS_KEY ?? "";
+  const key = process.env.OGEE_KEY ?? "";
 
   return key !== "" && req.headers.get("authorization") === `Bearer ${key}`;
 };
