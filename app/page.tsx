@@ -143,7 +143,8 @@ const Home = async () => {
             </p>
             <CopyCommand command="npx ogee card.html --video 4" />
             <p className="hint">
-              Needs <code>OGEE_KEY</code>. Prints a fresh link.
+              Needs <code>OGEE_KEY</code>. Prints a fresh link: a card in under a second, a 4s video
+              in about 7.
             </p>
           </div>
           {run !== undefined && <Chat run={run} />}

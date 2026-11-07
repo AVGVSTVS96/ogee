@@ -18,7 +18,7 @@ npx ogee chart.png                                       # an image you already 
 echo '<h1>hi</h1>' | npx ogee - --title "hi"             # HTML from stdin
 ```
 
-It prints the link. `--json` prints the image and video URLs too. It needs `OGEE_KEY`; `OGEE_URL` points it at a self-hosted server.
+It prints the link, usually in under a second for an image and about 1.7 seconds per second of video (a 4s video takes about 7s; the first call after a quiet spell adds about 3s). `--json` prints the image and video URLs too. It needs `OGEE_KEY`; `OGEE_URL` points it at a self-hosted server.
 
 Without the CLI it's one request:
 
