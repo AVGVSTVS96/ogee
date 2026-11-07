@@ -231,6 +231,7 @@ h1 em {
   margin-top: 14px;
   font-size: 14px;
   color: var(--subtle);
+  text-wrap: balance;
 }
 
 .hint code {
