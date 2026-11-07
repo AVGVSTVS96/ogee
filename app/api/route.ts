@@ -12,10 +12,12 @@ const fromHtml = async (id: string, html: string, request: Upload) => {
   if (videoSeconds > 0) {
     const { video, poster } = await record(html, width, height, videoSeconds);
 
-    return {
-      image: await upload(id, "poster.jpg", poster, "image/jpeg"),
-      video: await upload(id, "video.mp4", video, "video/mp4"),
-    };
+    const [image, mp4] = await Promise.all([
+      upload(id, "poster.jpg", poster, "image/jpeg"),
+      upload(id, "video.mp4", video, "video/mp4"),
+    ]);
+
+    return { image, video: mp4 };
   }
 
   const still = await screenshot(html, width, height);
